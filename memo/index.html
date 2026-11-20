@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7ec">
+  <meta name="description" content="在日历里安排待办，随手记下灵感与日记，回顾这一周的进展。">
+  <title>拾日 · 个人备忘录</title>
+  <link rel="stylesheet" href="./style.css?v=3">
+  <script src="./cat.js?v=1" defer></script>
+  <script src="./week-cat.js" defer></script>
+  <script src="./chat-config.js?v=1" defer></script>
+  <script src="./app.js?v=3" defer></script>
+  <script src="./dashboard-extras.js" defer></script>
+  <script src="./cat-chat.js?v=2" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-icon" data-icon="book"></span>
+        <span><strong>拾日</strong><small>个人备忘录</small></span>
+      </div>
+      <div class="header-actions">
+        <span class="storage-label"><span data-icon="lock"></span><span id="storage-label">本机保存</span></span>
+        <button class="button secondary demo-button" id="demo-toggle" type="button">退出示例</button>
+        <button class="button primary" id="new-record" type="button"><span data-icon="plus"></span> 新建记录</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="welcome">
+      <div>
+        <p class="date-line"><span data-icon="sun"></span><span id="today-label"></span></p>
+        <h1>我的手账</h1>
+        <p class="welcome-copy"><span data-icon="sparkles"></span><span id="daily-quote">今天可以慢一点，把心力留给真正重要的事。</span></p>
+      </div>
+      <span class="sample-status" id="sample-status"><span data-icon="flask"></span> 正在查看示例</span>
+    </div>
+
+    <div class="dashboard">
+      <div class="left-column">
+        <section class="card calendar" aria-labelledby="month-title">
+          <div class="card-heading">
+            <div class="heading-title"><span class="heading-icon" data-icon="calendar"></span><h2 id="month-title"></h2></div>
+            <div class="calendar-actions">
+              <button class="button compact" id="back-today" type="button">今天</button>
+              <button class="icon-button" id="previous-month" type="button" aria-label="上个月" data-icon="left"></button>
+              <button class="icon-button" id="next-month" type="button" aria-label="下个月" data-icon="right"></button>
+            </div>
+          </div>
+          <div class="weather-strip" aria-label="当前天气">
+            <span class="weather-icon" id="weather-icon" data-icon="cloud"></span>
+            <div class="weather-reading" aria-live="polite">
+              <strong id="weather-temperature" hidden></strong>
+              <span id="weather-caption">正在获取天气…</span>
+            </div>
+            <div class="weather-actions">
+              <button class="text-button" id="change-weather-city" type="button">换城市</button>
+              <a class="weather-credit" href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
+            </div>
+          </div>
+          <div class="weekdays" aria-hidden="true"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+          <div class="date-grid" id="date-grid" role="group" aria-label="选择日历日期"></div>
+          <div class="calendar-legend" id="calendar-legend" aria-label="分类颜色"></div>
+        </section>
+
+        <section class="card cat-card" aria-labelledby="cat-title">
+          <div class="cat-top">
+            <div class="cat-content">
+              <div class="heading-title"><span class="heading-icon" data-icon="sparkles"></span><h2 id="cat-title">AI 小猫</h2></div>
+              <p>聊聊今天的心情，让小猫陪你理一理。</p>
+            </div>
+            <button class="cat-trigger" id="cat-trigger" type="button" aria-label="和小猫互动">
+              <img class="cat-art" id="cat-art" src="./cat-1.gif" alt="" width="128" height="128">
+            </button>
+          </div>
+          <div class="cat-chat-window" id="cat-chat-window" aria-label="和小猫聊天">
+            <div class="chat-log" id="cat-chat-log" role="log" aria-label="与小猫的聊天记录" tabindex="0">
+              <p class="chat-message assistant">喵喵，主人今天心情怎么样呀喵？</p>
+            </div>
+            <div class="chat-quick-actions" id="cat-quick-chat" aria-label="快速回复" hidden>
+              <button type="button" data-chat-topic="hello">喵一声</button>
+              <button type="button" data-chat-topic="tired">今天有点累</button>
+              <button type="button" data-chat-topic="idea">给个小提示</button>
+              <button type="button" data-chat-topic="hug">想要抱抱</button>
+            </div>
+            <p class="chat-info" id="cat-chat-unavailable" hidden>在本机 worker/.dev.vars 填好你的 模型 API，保存后刷新即可自由聊天。</p>
+            <form id="cat-chat-form" hidden>
+              <label class="field" id="cat-code-field" hidden>聊天口令
+                <input id="cat-chat-code" type="password" maxlength="120" autocomplete="off" spellcheck="false" placeholder="输入站点管理员给你的口令">
+              </label>
+              <div class="chat-composer">
+                <textarea id="cat-chat-input" rows="2" maxlength="1800" aria-label="你的消息" placeholder="跟小猫说点什么…" required></textarea>
+                <button class="button primary" id="cat-chat-send" type="submit">发送</button>
+              </div>
+              <p class="form-error" id="cat-chat-status" role="status" hidden></p>
+              <div class="chat-footer">
+                <span id="cat-chat-note">发送的消息由 你配置的模型回复</span>
+                <button class="text-button" id="cat-chat-clear" type="button">清空</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <div class="planning-column">
+        <div class="planning-panels">
+          <section class="card agenda" aria-labelledby="agenda-title">
+            <div class="card-heading">
+              <div class="heading-title"><span class="heading-icon" data-icon="list"></span><h2 id="agenda-title">今日安排</h2></div>
+              <button class="icon-button add-button" type="button" id="agenda-add" aria-label="为所选日期新建记录" data-icon="plus"></button>
+            </div>
+            <p class="card-subtitle" id="agenda-date"></p>
+            <section class="focus-box" aria-labelledby="focus-title">
+              <div class="focus-heading">
+                <h3 id="focus-title"><span data-icon="star"></span> 重点事项</h3>
+                <label class="limit-label"><span>上限</span><select id="focus-limit" aria-label="每日重点事项上限">
+                  <option value="1">1 项</option><option value="2">2 项</option><option value="3">3 项</option>
+                  <option value="4">4 项</option><option value="5">5 项</option><option value="6">6 项</option>
+                  <option value="7">7 项</option><option value="8">8 项</option><option value="9">9 项</option><option value="10">10 项</option>
+                </select></label>
+              </div>
+              <div id="focus-list"></div>
+            </section>
+            <section id="urgent-section" aria-labelledby="urgent-title">
+              <h3 class="section-label urgent-label" id="urgent-title"><span data-icon="clock"></span> 临近截止</h3>
+              <div class="record-list" id="urgent-list"></div>
+            </section>
+            <section class="entries" aria-labelledby="entries-title">
+              <div class="entries-heading">
+                <h3 class="section-label" id="entries-title">当天记录</h3>
+                <button class="text-button" type="button" id="all-records">全部记录</button>
+              </div>
+              <div class="record-list" id="day-list"></div>
+            </section>
+          </section>
+
+          <section class="card weekly" aria-labelledby="weekly-title">
+            <div class="card-heading">
+              <div class="heading-title"><span class="heading-icon" data-icon="report"></span><h2 id="weekly-title">本周回顾</h2></div>
+              <div class="week-actions">
+                <button class="icon-button" id="previous-week" type="button" aria-label="上一周" data-icon="left"></button>
+                <button class="icon-button" id="next-week" type="button" aria-label="下一周" data-icon="right"></button>
+              </div>
+            </div>
+            <p class="card-subtitle" id="week-range"></p>
+            <div class="week-overview">
+              <div class="stat"><span>已完成</span><strong id="week-done">0</strong></div>
+              <div class="stat"><span>灵感</span><strong id="week-ideas">0</strong></div>
+              <div class="stat"><span>日记</span><strong id="week-journals">0</strong></div>
+            </div>
+            <section class="recap">
+              <h3 class="section-label"><span class="recap-icon done-icon" data-icon="check"></span> 完成的事</h3>
+              <ul id="week-completed-list" class="recap-list"></ul>
+            </section>
+            <section class="recap">
+              <h3 class="section-label"><span class="recap-icon idea-icon" data-icon="bulb"></span> 灵感进展</h3>
+              <ul id="week-idea-list" class="recap-list"></ul>
+            </section>
+            <section class="recap">
+              <h3 class="section-label"><span class="recap-icon mood-icon" data-icon="heart"></span> 心情手记</h3>
+              <p class="mood-summary" id="week-mood"></p>
+              <ul id="week-journal-list" class="recap-list"></ul>
+            </section>
+            <section class="recap" id="week-photo-section" hidden>
+              <div class="entries-heading">
+                <h3 class="section-label"><span class="recap-icon photo-icon" data-icon="photo"></span> 本周照片</h3>
+                <button class="text-button" id="add-week-photo" type="button">添加照片</button>
+              </div>
+              <div class="week-gallery" id="week-photos"></div>
+            </section>
+          </section>
+        </div>
+        <section class="card week-summary" id="week-summary" aria-labelledby="week-summary-title" hidden>
+          <div class="card-heading">
+            <div class="heading-title"><span class="heading-icon" data-icon="sparkles"></span><h2 id="week-summary-title">周报汇总</h2></div>
+            <button class="button compact" type="button" id="generate-week-summary">让小猫总结</button>
+          </div>
+          <p class="card-subtitle" id="week-summary-range"></p>
+          <div class="week-summary-content">
+            <div class="week-summary-copy">
+              <p class="week-summary-text" id="week-summary-text" aria-live="polite" hidden></p>
+              <p class="week-summary-status" id="week-summary-status" role="status" hidden></p>
+            </div>
+            <canvas class="week-cat-portrait" id="week-cat-portrait" role="img" aria-label="黑线小猫" width="320" height="228">黑线小猫</canvas>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="weather-dialog" aria-labelledby="weather-title">
+    <div class="dialog-heading">
+      <h2 id="weather-title">选择天气城市</h2>
+      <button class="icon-button" id="weather-close" type="button" aria-label="关闭" data-icon="close"></button>
+    </div>
+    <form class="weather-search" id="weather-search">
+      <label class="field">城市名称<input id="weather-city-query" type="search" required minlength="2" maxlength="80" placeholder="如北京、杭州" autofocus></label>
+      <button class="button primary" type="submit">搜索</button>
+    </form>
+    <p class="empty-note" id="weather-search-status" role="status" hidden></p>
+    <ul class="weather-results" id="weather-city-results"></ul>
+  </dialog>
+
+  <dialog id="record-dialog" aria-labelledby="record-title">
+    <form id="record-form">
+      <div class="dialog-heading">
+        <h2 id="record-title">新建记录</h2>
+        <button type="button" class="icon-button" id="record-close" aria-label="关闭" data-icon="close"></button>
+      </div>
+      <p class="form-note" id="record-note" hidden>保存后会退出示例，打开你的个人手账。</p>
+      <label class="field">标题<input name="title" required maxlength="100" placeholder="记下一件事…" autofocus></label>
+      <div class="field-row">
+        <label class="field">分类<select name="type" id="record-type"></select></label>
+        <label class="field"><span id="record-date-label">日期</span><input name="date" type="date" required min="0001-01-01" max="9999-12-31"></label>
+      </div>
+      <label class="field" id="mood-field" hidden>心情<select name="mood" id="record-mood">
+        <option value="">暂不选择</option><option>开心</option><option>平静</option><option>疲惫</option><option>低落</option><option>焦虑</option>
+      </select></label>
+      <label class="field">正文<textarea name="body" rows="5" maxlength="20000" placeholder="想多记一点的话，写在这里。"></textarea></label>
+      <div id="record-photo-section" hidden>
+        <label class="field">照片
+          <input id="record-photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" multiple aria-describedby="record-photo-hint">
+          <small class="photo-hint" id="record-photo-hint">每条最多 6 张，每张最多 10 MB。</small>
+        </label>
+        <div id="record-photo-list" class="record-gallery"></div>
+      </div>
+      <p class="form-error" id="record-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button class="button danger" id="delete-record" type="button" hidden>删除记录</button>
+        <button class="button secondary" id="cancel-record" type="button">取消</button>
+        <button class="button primary" id="save-record" type="submit">保存记录</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="library-dialog" aria-labelledby="library-title">
+    <div class="dialog-heading">
+      <h2 id="library-title">全部记录</h2>
+      <button type="button" class="icon-button" id="library-close" aria-label="关闭" data-icon="close"></button>
+    </div>
+    <div class="field-row">
+      <label class="field">搜索<input type="search" id="library-query" placeholder="搜索标题或正文"></label>
+      <label class="field">分类<select id="library-type"><option value="">全部分类</option></select></label>
+    </div>
+    <div class="record-list library-list" id="library-list"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

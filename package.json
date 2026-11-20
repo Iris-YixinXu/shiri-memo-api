@@ -1,0 +1,11 @@
+{
+  "name": "shiri-memo-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node worker/local.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
